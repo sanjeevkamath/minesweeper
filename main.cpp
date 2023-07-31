@@ -7,14 +7,14 @@ using namespace std;
 void setText(sf::Text &text, float x, float y);
 int main(){
     Window welcomeScreen;
+    GameWindow gameScreen;
     string playerName = "";
-
     // Initialize Welcome Window
     sf::RenderWindow welcomeWindow(sf::VideoMode(welcomeScreen.width,welcomeScreen.height), "Minesweeper");
     welcomeWindow.setFramerateLimit(60);
-    sf::Font font;
 
     //Load font from provided file
+    sf::Font font;
     if(!font.loadFromFile("files/font.ttf")){
         cout << "Error Loading font file" << endl;
         system("pause");
@@ -65,10 +65,19 @@ int main(){
                 return 0;
             }
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)){
-                welcomeWindow.close();
-                cout << playerName;
-                // Call on game open game window
+                if(playerName != ""){
+                    welcomeWindow.close();
+                    gameScreen.name = playerName;
+                    // Call on game open game window
+                    gameScreen.startGame();
+                }
             }
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Backspace) {
+                if (!playerName.empty()) {
+                    playerName.pop_back();
+                }
+            }
+
 
             // Input text from user
             if (event.type == sf::Event::TextEntered) {
@@ -92,11 +101,7 @@ int main(){
             setText(cursorText, welcomeScreen.width/2.0f + inputText.getLocalBounds().width / 2.0,
                     welcomeScreen.height/2.0f -45);
 
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Backspace) {
-                if (!playerName.empty()) {
-                    playerName.pop_back();
-                }
-            }
+
 
             // Display Text
             welcomeWindow.clear(sf::Color::Blue);
@@ -108,6 +113,8 @@ int main(){
 
         }
     }
+
+
     cout << playerName;
     return 0;
 }
