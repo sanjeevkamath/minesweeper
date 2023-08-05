@@ -3,9 +3,12 @@
 #include <string>
 #include <cctype>
 #include "window.h"
+
+
 using namespace std;
 void setText(sf::Text &text, float x, float y);
 int main(){
+//    Mine x(10, 10, 99);
     Window welcomeScreen;
     GameWindow gameScreen;
     string playerName = "";
@@ -116,6 +119,8 @@ int main(){
 
 
     cout << playerName;
+
+
     return 0;
 }
 
