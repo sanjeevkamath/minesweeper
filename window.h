@@ -45,6 +45,7 @@ class GameWindow : public Window{
     bool pause = false;
     bool debug = false;
     bool victory = false;
+    bool newGame = false;
 
     vector<vector<Tile>> tiles;
 

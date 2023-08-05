@@ -54,10 +54,10 @@ void Tile::exposeTile(){
             numberTexture.loadFromFile(numMinesString);
             numberSprite.setTexture(numberTexture);
         }
-//        else {
-//            revealEmptyTiles();
-//        }
-//
+        else {
+            revealEmptyTiles();
+        }
+
     }
 
 }
@@ -65,9 +65,6 @@ void Tile::exposeTile(){
 
 
 void Tile::revealEmptyTiles(){
-    if(neighboringMines > 0) {
-        return;
-    }
     for (int i = 0; i < adjacentTiles.size(); i++) {
         Tile* adjacentTile = adjacentTiles.at(i);
         if (adjacentTile->hidden && !adjacentTile->flag) {
@@ -75,20 +72,3 @@ void Tile::revealEmptyTiles(){
 
         }
 }}
-
-//            void Tile::revealEmptyTiles(){
-//
-//                for (int i = 0; i < adjacentTiles.size(); i++) {
-//                    Tile* adjacentTile = adjacentTiles.at(i);
-//                    if (!adjacentTile->hidden || adjacentTile->flag) {
-//                        // Skip tiles that are already revealed or flagged
-//                        continue;
-//                    }
-//                    adjacentTile->exposeTile();
-//                    if (adjacentTile->neighboringMines == 0) {
-//                        // If the adjacent tile has no neighboring mines, recursively reveal its adjacent tiles
-//                        adjacentTile->revealEmptyTiles();
-//                    }
-//                }
-//
-//            }

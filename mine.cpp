@@ -21,7 +21,6 @@ Mine::Mine(int rows, int columns, int numMines) {
                 next = false;
             }
         }
-        cout << mineLocation.at(i) << endl;
     }
 
     int counter = 0;

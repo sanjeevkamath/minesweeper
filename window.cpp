@@ -46,13 +46,11 @@ GameWindow::GameWindow() {
     minutes.setPosition ((columns*32) - 76, 32*(rows + 0.5f) + 16);
     tenSeconds.setPosition((columns * 32) - 54, 32 * (rows + 0.5f) + 16);
     seconds.setPosition((columns * 32) - 33, 32 * (rows + 0.5f) + 16);
-
     counterHundreds.setPosition (33, 32 * ((rows)+0.5f)+16);
     counterTens.setPosition (54, 32 * ((rows)+0.5f)+16);
     counterOnes.setPosition (75, 32 * ((rows)+0.5f)+16);
 
     negativeSprite.setPosition(12, 32 * ((rows)+0.5f)+16);
-
     happyFaceSprite.setPosition((columns / 2.0) * 32 - 32,
                                 32 * (rows + 0.5f));
     debugSprite.setPosition((width) - 304,
@@ -113,6 +111,13 @@ void GameWindow::startGame() {
             if(event.type == sf::Event::MouseButtonPressed){
                 sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
+                if(happyFaceSprite.getGlobalBounds().contains(sf::Vector2f(mousePosition))
+                   && event.mouseButton.button == sf::Mouse::Left){
+                    newGame = true;
+                    window.close();
+                }
+
+
                 if(debugSprite.getGlobalBounds().contains(sf::Vector2f(mousePosition))
                    && event.mouseButton.button == sf::Mouse::Left){
                     debug = !debug;
@@ -149,14 +154,8 @@ void GameWindow::startGame() {
 
 
             pauseTime = pauseclock.getElapsedTime();
-//            victory = checkVictory();            if (victory) cout << "YOU WINNNNN" << endl;
-
-
-
-
-
-
-
+            victory = checkVictory();
+            if (victory)    cout << "YOU WINNNNN";
 
 
         }
@@ -167,12 +166,9 @@ void GameWindow::startGame() {
                 window.draw(tiles.at(i).at(j).tileSprite);
                 window.draw(tiles.at(i).at(j).numberSprite);
 
-                if (tiles.at(i).at(j).flag){
-                    window.draw(tiles.at(i).at(j).flagSprite);
-                }
+                if (tiles.at(i).at(j).flag)              window.draw(tiles.at(i).at(j).flagSprite);
                 if(debug && tiles.at(i).at(j).hasMine)   window.draw(tiles.at(i).at(j).mineSprite);
-
-                if(pause)   window.draw(tiles.at(i).at(j).pauseSprite);
+                if(pause)                                      window.draw(tiles.at(i).at(j).pauseSprite);
 
             }
         }
@@ -190,12 +186,17 @@ void GameWindow::startGame() {
         window.draw(counterOnes);
         if(remainingMines < 0)  window.draw(negativeSprite);
         window.draw(debugSprite);
-        if(pause){
-            window.draw(playSprite);
-        }
+        if(pause)       window.draw(playSprite);
         else            window.draw(pauseSprite);
         window.draw(leaderboardSprite);
         window.display();
+    }
+
+    if(newGame){
+        
+        GameWindow newGameWindow;
+        newGameWindow.name = name;
+        newGameWindow.startGame();
     }
 }
 
@@ -293,12 +294,10 @@ void GameWindow::checkAdjacent() {
 bool GameWindow::checkVictory(){
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            if(tiles.at(i).at(j).flag || tiles.at(i).at(j).hidden){
-                continue;
-            }
-            else{
+            if(!tiles.at(i).at(j).flag && tiles.at(i).at(j).hidden){
                 return false;
             }
+
         }
     }
     return true;
