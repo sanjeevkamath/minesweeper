@@ -3,6 +3,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include <cstdlib>
+#include <sstream>
 #include <ctime>
 #include "tile.h"
 #include "mine.h"
@@ -15,7 +16,8 @@ public:
     float width, height;
     int rows, columns, mines;
     Window();   //Default Constructor
-};
+    void setText(sf::Text &text, float x, float y);
+    };
 
 class GameWindow : public Window{
     int tileCount = rows * columns;
@@ -29,7 +31,6 @@ class GameWindow : public Window{
     sf::Texture negativeTexture;
 
     Digit digits;
-
     sf::Sprite happyFaceSprite;
     sf::Sprite debugSprite;
     sf::Sprite playSprite;
@@ -46,6 +47,7 @@ class GameWindow : public Window{
     bool debug = false;
     bool victory = false;
     bool newGame = false;
+    bool leaderboardBool = false;
 
     vector<vector<Tile>> tiles;
 
@@ -55,10 +57,24 @@ class GameWindow : public Window{
     void updateTimer(int timeSeconds);
     void checkAdjacent();
     bool checkVictory();
-    void debugTiles();
 public:
     void startGame();
     GameWindow();
 
 };
 
+
+class LeaderBoardWindow : public Window{
+    sf::Text headerText;
+    sf::Text bodyText;
+    struct Leaders{
+        string leaderName;
+        string time;
+    };
+public:
+    LeaderBoardWindow();
+    void openLeaderBoard();
+    vector<Leaders> rankings;
+    string leaderString = "";
+
+};

@@ -21,6 +21,13 @@ Window::Window() {
     }
 }
 
+void Window::setText(sf::Text &text, float x, float y){
+    sf::FloatRect textRect = text.getLocalBounds();
+    text.setOrigin(textRect.left + textRect.width/2.0f,
+                   textRect.top + textRect.height/2.0f);
+    text.setPosition(sf::Vector2f(x, y));
+}
+
 GameWindow::GameWindow() {
     remainingMines = mines;
 
@@ -98,7 +105,8 @@ void GameWindow::startGame() {
 
     sf::Clock pauseclock;
     sf::Clock clock;
-    sf::Time pauseTime, totalPauseTime;
+    sf::Clock leaderboardClock;
+    sf::Time pauseTime, totalPauseTime, leaderboardTime, totalLeaderboardTime;
 
     while(window.isOpen()){
         sf::Event event;
@@ -115,6 +123,28 @@ void GameWindow::startGame() {
                    && event.mouseButton.button == sf::Mouse::Left){
                     newGame = true;
                     window.close();
+                }
+
+
+                if(leaderboardSprite.getGlobalBounds().contains(sf::Vector2f(mousePosition))
+                   && event.mouseButton.button == sf::Mouse::Left){
+
+                    if (pause){
+                        LeaderBoardWindow leader;
+                    }
+                    else{
+
+                        pause = true;
+                        leaderboardClock.restart();
+                        LeaderBoardWindow leader;
+                        leaderboardTime = leaderboardClock.getElapsedTime();
+                        pause  = false;
+                        totalLeaderboardTime += leaderboardTime;
+                    }
+
+                    leaderboardBool = false;
+                    continue;
+
                 }
 
 
@@ -159,20 +189,33 @@ void GameWindow::startGame() {
 
 
         }
+
+
         // Display Text
         window.clear(sf::Color::Blue);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                window.draw(tiles.at(i).at(j).tileSprite);
-                window.draw(tiles.at(i).at(j).numberSprite);
+                if(!leaderboardBool){
+                    window.draw(tiles.at(i).at(j).tileSprite);
+                    window.draw(tiles.at(i).at(j).numberSprite);
 
-                if (tiles.at(i).at(j).flag)              window.draw(tiles.at(i).at(j).flagSprite);
-                if(debug && tiles.at(i).at(j).hasMine)   window.draw(tiles.at(i).at(j).mineSprite);
-                if(pause)                                      window.draw(tiles.at(i).at(j).pauseSprite);
+                    if (tiles.at(i).at(j).flag)              window.draw(tiles.at(i).at(j).flagSprite);
+                    if(debug && tiles.at(i).at(j).hasMine)   window.draw(tiles.at(i).at(j).mineSprite);
+                    if(pause)                                      window.draw(tiles.at(i).at(j).pauseSprite);
+                }
+                else{
+                    for(int i = 0; i < rows; i++){
+                        for(int j = 0; j< columns; j++) {
+                            window.draw(tiles.at(i).at(j).leaderboardTime);
+                        }
+                    }
+                }
+
 
             }
         }
-        sf::Time elapsedTime = clock.getElapsedTime() - totalPauseTime;
+
+        sf::Time elapsedTime = clock.getElapsedTime() - totalPauseTime - totalLeaderboardTime;
 
         //cout << elapsedTime.asSeconds() << endl;
         if (!pause)     updateTimer(elapsedTime.asSeconds());
@@ -190,10 +233,14 @@ void GameWindow::startGame() {
         else            window.draw(pauseSprite);
         window.draw(leaderboardSprite);
         window.display();
+
+        if(leaderboardBool){
+
+        }
     }
 
     if(newGame){
-        
+
         GameWindow newGameWindow;
         newGameWindow.name = name;
         newGameWindow.startGame();
@@ -290,7 +337,7 @@ void GameWindow::checkAdjacent() {
 
 }
 
-//FIX
+
 bool GameWindow::checkVictory(){
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -301,4 +348,76 @@ bool GameWindow::checkVictory(){
         }
     }
     return true;
+}
+
+
+
+
+
+
+
+
+
+LeaderBoardWindow::LeaderBoardWindow() {
+    sf::Font font;
+    font.loadFromFile("files/font.ttf");
+
+    headerText.setFont(font);
+    headerText.setString("LEADERBOARD");
+    headerText.setFillColor(sf::Color::White);
+    headerText.setCharacterSize(20);
+    setText(headerText, width/4.0f, height/4.0f -120);
+    headerText.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+    ifstream file("files/leaderboard.txt");
+    if(file.is_open()){
+        string line;
+        while (getline(file, line)) {
+            Leaders leader;
+            stringstream ss(line);
+
+            // Extracting time and leaderName from the line
+            getline(ss, leader.time, ',');
+            getline(ss, leader.leaderName, ',');
+
+            rankings.push_back(leader);
+        }
+
+        file.close();
+    }
+
+    leaderString = "1.\t" + rankings.at(0).time + "\t" + rankings.at(0).leaderName + "\n\n"
+            + "2.\t" + rankings.at(1).time + "\t" + rankings.at(1).leaderName + "\n\n"
+            + "3.\t" + rankings.at(2).time + "\t" + rankings.at(2).leaderName + "\n\n"
+            + "4.\t" + rankings.at(3).time + "\t" + rankings.at(3).leaderName + "\n\n"
+            + "5.\t" + rankings.at(4).time + "\t" + rankings.at(4).leaderName;
+
+    bodyText.setFont(font);
+    bodyText.setString(leaderString);
+    bodyText.setFillColor(sf::Color::White);
+    bodyText.setCharacterSize(18);
+    setText(bodyText, width/4.0f, height/4.0f + 20);
+    bodyText.setStyle(sf::Text::Bold);
+
+    openLeaderBoard();
+}
+
+void LeaderBoardWindow::openLeaderBoard() {
+    sf::RenderWindow leaderboardWindow(sf::VideoMode(width/2, height/2), "Minesweeper");
+    leaderboardWindow.setFramerateLimit(60);
+
+    leaderboardWindow.isOpen();
+    while (leaderboardWindow.isOpen()) {
+        sf::Event event;
+        while (leaderboardWindow.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                leaderboardWindow.close();
+            }
+        }
+
+        leaderboardWindow.clear(sf::Color::Blue);
+        leaderboardWindow.draw(headerText);
+        leaderboardWindow.draw(bodyText);
+        leaderboardWindow.display();
+    }
 }

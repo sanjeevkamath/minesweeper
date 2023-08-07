@@ -10,13 +10,13 @@ Tile::Tile(int x, int y) {
     flagTexture.loadFromFile("files/images/flag.png");
     mineTexture.loadFromFile("files/images/mine.png");
 
-
+    leaderboardTime.setTexture(revealedTexture);
     tileSprite.setTexture(hiddenTexture);
     flagSprite.setTexture(flagTexture);
     mineSprite.setTexture(mineTexture);
     pauseSprite.setTexture(revealedTexture);
 
-
+    leaderboardTime.setPosition(x,y);
     tileSprite.setPosition(x,y);
     flagSprite.setPosition(x,y);
     mineSprite.setPosition(x,y);

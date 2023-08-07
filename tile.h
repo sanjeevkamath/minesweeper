@@ -21,6 +21,8 @@ public:
     sf::Sprite flagSprite;
     sf::Sprite mineSprite;
     sf::Sprite pauseSprite;
+    sf::Sprite leaderboardTime;
+
 
     bool flag = false;
     bool hidden = true;
