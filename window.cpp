@@ -137,14 +137,15 @@ void GameWindow::startGame() {
                         pause = true;
                         leaderboardClock.restart();
                         LeaderBoardWindow leader;
-                        leaderboardTime = leaderboardClock.getElapsedTime();
-                        pause  = false;
-                        totalLeaderboardTime += leaderboardTime;
+                        leaderboardBool = true;
+//                        leaderboardTime = leaderboardClock.getElapsedTime();
+//                        pause  = false;
+//                        totalLeaderboardTime += leaderboardTime;
                     }
 
-                    leaderboardBool = false;
-                    continue;
+//                    leaderboardBool = false;
 
+                    // //////////////////////////////////////////////////////////////////////
                 }
 
 
@@ -188,7 +189,27 @@ void GameWindow::startGame() {
             if (victory)    cout << "YOU WINNNNN";
 
 
+
+            if(leaderboardBool){
+
+                leaderboardTime = leaderboardClock.getElapsedTime();
+                pause  = false;
+                totalLeaderboardTime += leaderboardTime;
+
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < columns; j++) {
+
+                        tiles.at(i).at(j).reloadTextures();
+
+                    }
+                }
+                leaderboardBool = false;
+
+            }
+
         }
+
+
 
 
         // Display Text
@@ -234,9 +255,7 @@ void GameWindow::startGame() {
         window.draw(leaderboardSprite);
         window.display();
 
-        if(leaderboardBool){
 
-        }
     }
 
     if(newGame){
@@ -278,50 +297,50 @@ void GameWindow::checkAdjacent() {
     for(int i = 0; i < rows; i++){
         for(int j = 0; j< columns; j++){
 
-            // Element at i-1, j-1
+            // Check (i-1, j-1)
             if (i - 1 >= 0 && j - 1 >= 0) {
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i-1).at(j-1)));
                 if((tiles.at(i-1).at(j-1)).hasMine)       (tiles.at(i).at(j)).neighboringMines ++;
             }
 
             if (i - 1 >= 0) {
-                // Process the element at (i-1, j)
+                // Chck (i-1, j)
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i-1).at(j)));
                 if(tiles.at(i-1).at(j).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }
 
             if (i - 1 >= 0 && j + 1 < columns) {
-                // Process the element at (i-1, j+1)
+                // Check (i-1, j+1)
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i-1).at(j+1)));
                 if(tiles.at(i-1).at(j+1).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }
 
             if (j - 1 >= 0) {
-                // Process the element at (i, j-1)
+                // check (i, j-1)
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i).at(j-1)));
                 if(tiles.at(i).at(j-1).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }
 
             if (j + 1 < columns) {
-                // Process the element at (i, j+1)
+                // check (i, j+1)
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i).at(j+1)));
                 if(tiles.at(i).at(j+1).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }
 
             if (i + 1 < rows && j - 1 >= 0) {
-                // Process the element at (i+1, j-1)
+                //Check (i+1, j-1)
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i+1).at(j-1)));
                 if(tiles.at(i+1).at(j-1).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }
 
             if (i + 1 < rows) {
-                // Process the element at (i+1, j)
+                // check (i+1, j)
                 tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i+1).at(j)));
                 if(tiles.at(i+1).at(j).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }
 
             if (i + 1 < rows && j + 1 < columns) {
-                // Process the element at (i+1, j+1)
+                // check (i+1, j+1)
             tiles.at(i).at(j).adjacentTiles.push_back(&(tiles.at(i+1).at(j+1)));
                 if(tiles.at(i+1).at(j+1).hasMine)      tiles.at(i).at(j).neighboringMines ++;
             }

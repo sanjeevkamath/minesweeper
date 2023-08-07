@@ -61,6 +61,7 @@ public:
     void startGame();
     GameWindow();
 
+
 };
 
 
@@ -77,4 +78,5 @@ public:
     vector<Leaders> rankings;
     string leaderString = "";
 
-};
+    };
+

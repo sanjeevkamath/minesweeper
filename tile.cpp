@@ -71,4 +71,26 @@ void Tile::revealEmptyTiles(){
             adjacentTile->exposeTile();
 
         }
-}}
+    }
+}
+
+
+
+
+void Tile::reloadTextures() {
+    leaderboardTime.setTexture(revealedTexture);
+    flagSprite.setTexture(flagTexture);
+    mineSprite.setTexture(mineTexture);
+    pauseSprite.setTexture(revealedTexture);
+
+    if(hidden){
+        tileSprite.setTexture(hiddenTexture);
+    }
+    else{
+        tileSprite.setTexture(revealedTexture);
+    }
+}
+
+
+
+

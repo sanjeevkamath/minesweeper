@@ -38,4 +38,9 @@ public:
     void exposeTile();
     void markFlag();
     void revealEmptyTiles();
+    void reloadTextures();
+
+
 };
+
+
