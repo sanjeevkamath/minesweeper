@@ -130,20 +130,23 @@ void GameWindow::startGame() {
                    && event.mouseButton.button == sf::Mouse::Left){
 
                     if (pause){
-                        LeaderBoardWindow leader;
+//                        LeaderBoardWindow leader;
+                        leaderboardBool = true;
+                        leaderboardPause = true;
                     }
                     else{
 
-                        pause = true;
+//                        pause = true;
                         leaderboardClock.restart();
-                        LeaderBoardWindow leader;
+//                        LeaderBoardWindow leader;
                         leaderboardBool = true;
+                        leaderboardPause = false;
+                        pause = true;
 //                        leaderboardTime = leaderboardClock.getElapsedTime();
 //                        pause  = false;
 //                        totalLeaderboardTime += leaderboardTime;
                     }
 
-//                    leaderboardBool = false;
 
                     // //////////////////////////////////////////////////////////////////////
                 }
@@ -190,22 +193,6 @@ void GameWindow::startGame() {
 
 
 
-            if(leaderboardBool){
-
-                leaderboardTime = leaderboardClock.getElapsedTime();
-                pause  = false;
-                totalLeaderboardTime += leaderboardTime;
-
-                for (int i = 0; i < rows; i++) {
-                    for (int j = 0; j < columns; j++) {
-
-                        tiles.at(i).at(j).reloadTextures();
-
-                    }
-                }
-                leaderboardBool = false;
-
-            }
 
         }
 
@@ -216,21 +203,20 @@ void GameWindow::startGame() {
         window.clear(sf::Color::Blue);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if(!leaderboardBool){
                     window.draw(tiles.at(i).at(j).tileSprite);
                     window.draw(tiles.at(i).at(j).numberSprite);
 
                     if (tiles.at(i).at(j).flag)              window.draw(tiles.at(i).at(j).flagSprite);
                     if(debug && tiles.at(i).at(j).hasMine)   window.draw(tiles.at(i).at(j).mineSprite);
                     if(pause)                                      window.draw(tiles.at(i).at(j).pauseSprite);
-                }
-                else{
-                    for(int i = 0; i < rows; i++){
-                        for(int j = 0; j< columns; j++) {
-                            window.draw(tiles.at(i).at(j).leaderboardTime);
-                        }
-                    }
-                }
+
+//                else{
+//                    for(int i = 0; i < rows; i++){
+//                        for(int j = 0; j< columns; j++) {
+//                            window.draw(tiles.at(i).at(j).leaderboardTime);
+//                        }
+//                    }
+//                }
 
 
             }
@@ -254,6 +240,36 @@ void GameWindow::startGame() {
         else            window.draw(pauseSprite);
         window.draw(leaderboardSprite);
         window.display();
+
+
+
+        if(leaderboardBool && leaderboardPause){
+            LeaderBoardWindow leaders;
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+
+                    tiles.at(i).at(j).reloadTextures();
+
+                }
+            }
+            leaderboardBool = false;
+        }
+
+        if(leaderboardBool && !leaderboardPause){
+            LeaderBoardWindow leader;
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+
+                    tiles.at(i).at(j).reloadTextures();
+
+                }
+            }
+            leaderboardTime = leaderboardClock.getElapsedTime();
+            totalLeaderboardTime += leaderboardTime;
+            pause= false;
+            leaderboardBool = false;
+        }
+
 
 
     }
