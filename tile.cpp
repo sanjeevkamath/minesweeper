@@ -43,6 +43,7 @@ void Tile::markFlag() {
 void Tile::exposeTile(){
     if(hasMine){
         cout << "Game over" << endl;
+        defeat = true;
         return;
     }
     if(!flag && hidden){

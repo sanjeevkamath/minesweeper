@@ -27,6 +27,7 @@ public:
     bool flag = false;
     bool hidden = true;
     bool hasMine = false;
+    bool defeat = false;
 
     int neighboringMines = 0;
     string numMinesString = "files/images/number_";

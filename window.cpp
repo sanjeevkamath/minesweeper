@@ -7,6 +7,7 @@
 #include "window.h"
 #include <vector>
 #include <cmath>
+#include <cstring>
 
 
 Window::Window() {
@@ -31,13 +32,15 @@ void Window::setText(sf::Text &text, float x, float y){
 GameWindow::GameWindow() {
     remainingMines = mines;
 
-
+    deadFaceTexture.loadFromFile("files/images/face_lose.png");
+    sunglassesTexture.loadFromFile("files/images/face_win.png");
     happyFaceTexture.loadFromFile("files/images/face_happy.png");
     debugTexture.loadFromFile("files/images/debug.png");
     playTexture.loadFromFile("files/images/play.png");
     pauseTexture.loadFromFile("files/images/pause.png");
     leaderboardTexture.loadFromFile("files/images/leaderboard.png");
     negativeTexture.loadFromFile("files/images/digits.png",sf::IntRect(10 * 21,0,21,32));
+
 
     happyFaceSprite.setTexture(happyFaceTexture);
     debugSprite.setTexture(debugTexture);
@@ -80,7 +83,8 @@ void GameWindow::startGame() {
     window.setFramerateLimit(60);
 
     int counter = 1;
-
+    string timeString = "";
+    LeaderBoardWindow leader;
     //Randomly generate required number of mines using mine class
     Mine mineLocations(rows, columns, mines);
 
@@ -98,15 +102,13 @@ void GameWindow::startGame() {
         tiles.push_back(row);
     }
 
+    // Creates Vector of Adjacent tiles
     checkAdjacent();
 
-
-
-
-    sf::Clock pauseclock;
-    sf::Clock clock;
-    sf::Clock leaderboardClock;
+    //Initialize all the clocks
+    sf::Clock pauseclock, clock, leaderboardClock;
     sf::Time pauseTime, totalPauseTime, leaderboardTime, totalLeaderboardTime;
+    sf::Time elapsedTime;
 
     while(window.isOpen()){
         sf::Event event;
@@ -130,35 +132,28 @@ void GameWindow::startGame() {
                    && event.mouseButton.button == sf::Mouse::Left){
 
                     if (pause){
-//                        LeaderBoardWindow leader;
                         leaderboardBool = true;
                         leaderboardPause = true;
                     }
                     else{
 
-//                        pause = true;
                         leaderboardClock.restart();
-//                        LeaderBoardWindow leader;
                         leaderboardBool = true;
                         leaderboardPause = false;
                         pause = true;
-//                        leaderboardTime = leaderboardClock.getElapsedTime();
-//                        pause  = false;
-//                        totalLeaderboardTime += leaderboardTime;
                     }
 
 
-                    // //////////////////////////////////////////////////////////////////////
                 }
 
 
                 if(debugSprite.getGlobalBounds().contains(sf::Vector2f(mousePosition))
-                   && event.mouseButton.button == sf::Mouse::Left){
+                   && event.mouseButton.button == sf::Mouse::Left && !victory && !defeat){
                     debug = !debug;
                 }
 
                 if(pauseSprite.getGlobalBounds().contains(sf::Vector2f(mousePosition))
-                                            && event.mouseButton.button == sf::Mouse::Left){
+                                            && event.mouseButton.button == sf::Mouse::Left && !victory && !defeat){
                     pause = !pause;
                     if(pause)   pauseclock.restart();
                     else    totalPauseTime += pauseTime;
@@ -167,11 +162,12 @@ void GameWindow::startGame() {
                     for(int i = 0; i < rows; i++){
                         for(int j = 0; j< columns; j++){
                             if(tiles.at(i).at(j).tileSprite.getGlobalBounds().contains(sf::Vector2f(mousePosition))){
-                                if (event.mouseButton.button == sf::Mouse::Left && tiles.at(i).at(j).hidden){
+                                if (event.mouseButton.button == sf::Mouse::Left && tiles.at(i).at(j).hidden && !defeat && !victory){
                                     tiles.at(i).at(j).exposeTile();
+                                    if(tiles.at(i).at(j).defeat)    defeat = true;
                                 }
 
-                                else if (event.mouseButton.button == sf::Mouse::Right && tiles.at(i).at(j).hidden) {
+                                else if (event.mouseButton.button == sf::Mouse::Right && tiles.at(i).at(j).hidden && !defeat) {
                                     tiles.at(i).at(j).markFlag();
                                     //Update Counter accordingly
                                     if(tiles.at(i).at(j).flag)   remainingMines --;
@@ -189,14 +185,14 @@ void GameWindow::startGame() {
 
             pauseTime = pauseclock.getElapsedTime();
             victory = checkVictory();
-            if (victory)    cout << "YOU WINNNNN";
-
-
+            if(victory)                 happyFaceSprite.setTexture(sunglassesTexture);
+            if(defeat)  {
+                debug = true;
+                happyFaceSprite.setTexture(deadFaceTexture);
+            }
 
 
         }
-
-
 
 
         // Display Text
@@ -210,22 +206,12 @@ void GameWindow::startGame() {
                     if(debug && tiles.at(i).at(j).hasMine)   window.draw(tiles.at(i).at(j).mineSprite);
                     if(pause)                                      window.draw(tiles.at(i).at(j).pauseSprite);
 
-//                else{
-//                    for(int i = 0; i < rows; i++){
-//                        for(int j = 0; j< columns; j++) {
-//                            window.draw(tiles.at(i).at(j).leaderboardTime);
-//                        }
-//                    }
-//                }
-
-
             }
         }
 
-        sf::Time elapsedTime = clock.getElapsedTime() - totalPauseTime - totalLeaderboardTime;
+        elapsedTime = clock.getElapsedTime() - totalPauseTime - totalLeaderboardTime;
 
-        //cout << elapsedTime.asSeconds() << endl;
-        if (!pause)     updateTimer(elapsedTime.asSeconds());
+        if (!pause && !victory && !defeat)     updateTimer(elapsedTime.asSeconds());
         window.draw(tenMinutes);
         window.draw(minutes);
         window.draw(tenSeconds);
@@ -244,25 +230,22 @@ void GameWindow::startGame() {
 
 
         if(leaderboardBool && leaderboardPause){
-            LeaderBoardWindow leaders;
+            leader.openLeaderBoard();
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
-
                     tiles.at(i).at(j).reloadTextures();
-
                 }
             }
             leaderboardBool = false;
         }
 
         if(leaderboardBool && !leaderboardPause){
-            LeaderBoardWindow leader;
+            leader.openLeaderBoard();
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
-
                     tiles.at(i).at(j).reloadTextures();
-
                 }
+
             }
             leaderboardTime = leaderboardClock.getElapsedTime();
             totalLeaderboardTime += leaderboardTime;
@@ -270,18 +253,33 @@ void GameWindow::startGame() {
             leaderboardBool = false;
         }
 
+        if (victory && victoryCounter == 1)    {
+            victoryCounter = 2;
+            // Convert finalTime to Seconds
+            int finalTime = elapsedTime.asSeconds();
+
+            int finalTenMin = finalTime / 600;
+            int finalMinutes = (finalTime % 600) / 60;
+            int remainderSeconds = finalTime % 60;
+
+            // Format the time string as "xx:yy"
+            timeString = std::to_string(finalTenMin) + std::to_string(finalMinutes) + ":";
+            if (remainderSeconds < 10) {
+                timeString += "0";
+            }
+            timeString += std::to_string(remainderSeconds);
+            leader.checkLeader(name, timeString);
+        }
+
 
 
     }
-
     if(newGame){
-
         GameWindow newGameWindow;
         newGameWindow.name = name;
         newGameWindow.startGame();
     }
 }
-
 
 
 void GameWindow::updateCounter() {
@@ -379,30 +377,17 @@ bool GameWindow::checkVictory(){
             if(!tiles.at(i).at(j).flag && tiles.at(i).at(j).hidden){
                 return false;
             }
-
         }
     }
     return true;
 }
 
 
-
-
-
-
-
+//--------------------------------------------------------------------------------------------------------------------------------
 
 
 LeaderBoardWindow::LeaderBoardWindow() {
-    sf::Font font;
-    font.loadFromFile("files/font.ttf");
 
-    headerText.setFont(font);
-    headerText.setString("LEADERBOARD");
-    headerText.setFillColor(sf::Color::White);
-    headerText.setCharacterSize(20);
-    setText(headerText, width/4.0f, height/4.0f -120);
-    headerText.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
     ifstream file("files/leaderboard.txt");
     if(file.is_open()){
@@ -421,11 +406,28 @@ LeaderBoardWindow::LeaderBoardWindow() {
         file.close();
     }
 
+
+
+}
+
+void LeaderBoardWindow::openLeaderBoard() {
+    sf::Font font;
+    font.loadFromFile("files/font.ttf");
+
+    headerText.setFont(font);
+    headerText.setString("LEADERBOARD");
+    headerText.setFillColor(sf::Color::White);
+    headerText.setCharacterSize(20);
+    setText(headerText, width/4.0f, height/4.0f -120);
+    headerText.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+
+
     leaderString = "1.\t" + rankings.at(0).time + "\t" + rankings.at(0).leaderName + "\n\n"
-            + "2.\t" + rankings.at(1).time + "\t" + rankings.at(1).leaderName + "\n\n"
-            + "3.\t" + rankings.at(2).time + "\t" + rankings.at(2).leaderName + "\n\n"
-            + "4.\t" + rankings.at(3).time + "\t" + rankings.at(3).leaderName + "\n\n"
-            + "5.\t" + rankings.at(4).time + "\t" + rankings.at(4).leaderName;
+                   + "2.\t" + rankings.at(1).time + "\t" + rankings.at(1).leaderName + "\n\n"
+                   + "3.\t" + rankings.at(2).time + "\t" + rankings.at(2).leaderName + "\n\n"
+                   + "4.\t" + rankings.at(3).time + "\t" + rankings.at(3).leaderName + "\n\n"
+                   + "5.\t" + rankings.at(4).time + "\t" + rankings.at(4).leaderName;
 
     bodyText.setFont(font);
     bodyText.setString(leaderString);
@@ -434,10 +436,7 @@ LeaderBoardWindow::LeaderBoardWindow() {
     setText(bodyText, width/4.0f, height/4.0f + 20);
     bodyText.setStyle(sf::Text::Bold);
 
-    openLeaderBoard();
-}
 
-void LeaderBoardWindow::openLeaderBoard() {
     sf::RenderWindow leaderboardWindow(sf::VideoMode(width/2, height/2), "Minesweeper");
     leaderboardWindow.setFramerateLimit(60);
 
@@ -456,3 +455,32 @@ void LeaderBoardWindow::openLeaderBoard() {
         leaderboardWindow.display();
     }
 }
+
+void LeaderBoardWindow::checkLeader(std::string &partName, std::string &finalTime) {
+    Leaders participant;
+    participant.leaderName = partName + "*";
+    participant.time = finalTime;
+
+    for (int i = 0; i < rankings.size(); i++) {
+//        int strcmp( const char *finalTime, const char *rankings.at(i).time ;
+
+        if (participant.time < rankings.at(i).time){
+            cout << participant.time << " is less than " << rankings.at(i).time << endl;
+            rankings.insert(rankings.begin() + i, participant);
+            return;
+
+        }
+//        else if(participant.time.at(0) == rankings.at(i).time.at(0) && participant.time.at(1) < rankings.at(i).time.at(1)){
+//            rankings.insert(rankings.begin() + i, participant);
+//        }
+//        else if(participant.time.at(0) == rankings.at(i).time[0] && participant.time[1] == rankings.at(i).time[1] && participant.time[3] < rankings.at(i).time[3]){
+//            rankings.insert(rankings.begin() + i, participant);
+//        }
+//        else if(participant.time[0] == rankings.at(i).time[0] && participant.time[1] == rankings.at(i).time[1] && participant.time[3] == rankings.at(i).time[3]
+//                && participant.time[4] < rankings.at(i).time[4]){
+//            rankings.insert(rankings.begin() + i, participant);
+//
+//        }
+    }
+}
+

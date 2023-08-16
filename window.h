@@ -25,33 +25,30 @@ class GameWindow : public Window{
     sf::RenderWindow window;
 
     //Set Textures Buttons
-    sf::Texture happyFaceTexture;
+    sf::Texture happyFaceTexture, sunglassesTexture, deadFaceTexture;
     sf::Texture debugTexture;
     sf::Texture playTexture, pauseTexture, leaderboardTexture;
     sf::Texture negativeTexture;
 
     Digit digits;
-    sf::Sprite happyFaceSprite;
-    sf::Sprite debugSprite;
-    sf::Sprite playSprite;
-    sf::Sprite pauseSprite;
-    sf::Sprite leaderboardSprite;
-    sf::Sprite counterHundreds;
-    sf::Sprite counterTens;
-    sf::Sprite counterOnes;
+    sf::Sprite happyFaceSprite, debugSprite, playSprite, pauseSprite, leaderboardSprite;
+    sf::Sprite counterHundreds, counterTens, counterOnes;
     sf::Sprite negativeSprite;
-    sf::Sprite tenMinutes;
-    sf::Sprite minutes, tenSeconds, seconds;
+    sf::Sprite tenMinutes, minutes, tenSeconds, seconds;
+
 
     bool pause = false;
     bool debug = false;
     bool victory = false;
     bool newGame = false;
     bool leaderboardBool = false;
+    bool leaderboardPause = false;
+    bool defeat = false;
 
     vector<vector<Tile>> tiles;
 
     int remainingMines;
+    int victoryCounter = 1;
 
     void updateCounter();
     void updateTimer(int timeSeconds);
@@ -68,15 +65,17 @@ public:
 class LeaderBoardWindow : public Window{
     sf::Text headerText;
     sf::Text bodyText;
+public:
+
     struct Leaders{
         string leaderName;
         string time;
     };
-public:
     LeaderBoardWindow();
     void openLeaderBoard();
     vector<Leaders> rankings;
     string leaderString = "";
+    void checkLeader(string& partName,  string& finalTime);
 
     };
 
