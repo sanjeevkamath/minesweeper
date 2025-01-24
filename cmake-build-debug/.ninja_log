@@ -1,11 +1,14 @@
 # ninja log v5
 15	3356	7131523067980053	CMakeFiles/minesweeper.dir/main.cpp.obj	65ab876d9e6e1d92
-2	557	7132973643292653	build.ninja	6076401f96116c68
-148	4728	7132399567456283	CMakeFiles/minesweeper.dir/window.cpp.obj	dbe8ab4ad230f5ae
-7	1853	7132973217233959	minesweeper.exe	fae3f2383ece5879
+2	557	7593786259189272	build.ninja	6076401f96116c68
+6	2108	7138665781858980	CMakeFiles/minesweeper.dir/window.cpp.obj	dbe8ab4ad230f5ae
+2109	3759	7138665798252442	minesweeper.exe	fae3f2383ece5879
 6	772	7127186211458254	CMakeFiles/minesweeper.dir/Digit.cpp.obj	3c6070a07c6c175f
 47	3105	7131523065463315	CMakeFiles/minesweeper.dir/tile.cpp.obj	393e8c03e9d1ea3a
 9	1375	7132972104561329	CMakeFiles/minesweeper.dir/mine.cpp.obj	9c078b121a65eed1
-30	3953	7127116756185485	CMakeFiles/minesweeper.dir/digits.cpp.obj	882d6c4db13872e9
-6	2108	7138665781858980	CMakeFiles/minesweeper.dir/window.cpp.obj	dbe8ab4ad230f5ae
-2109	3759	7138665798252442	minesweeper.exe	fae3f2383ece5879
+84	2081	7593786392725397	CMakeFiles/minesweeper.dir/Digit.cpp.obj	2ea44cb2a493ce24
+103	2092	7593786392849927	CMakeFiles/minesweeper.dir/tile.cpp.obj	f69276039be3031f
+64	2345	7593786395430990	CMakeFiles/minesweeper.dir/mine.cpp.obj	643b8e86733d2db1
+45	2369	7593786395658233	CMakeFiles/minesweeper.dir/main.cpp.obj	a251400e55ef4
+10	2815	7593786400157575	CMakeFiles/minesweeper.dir/window.cpp.obj	707737229c734854
+2816	4958	7593786421552142	minesweeper.exe	fae3f2383ece5879
